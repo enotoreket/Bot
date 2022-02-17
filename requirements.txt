@@ -74,6 +74,7 @@ EasyProcess==0.2.5
 ecdsa==0.16.1
 Electrum==4.0.9
 email-validator==1.1.1
+et-xmlfile==1.1.0
 ExifRead==2.3.2
 faraday-agent-parameters-types==1.0.1
 faraday-client==1.1.0
@@ -196,6 +197,7 @@ olefile==0.46
 onboard==1.4.1
 onioncircuits==0.7
 onionshare==2.2
+openpyxl==3.0.9
 ordered-set==4.1.0
 ospd==21.4.1
 ospd-openvas==21.4.1
@@ -278,6 +280,7 @@ pysmbc==1.0.23
 pysmi==0.3.2
 pysnmp==4.4.12
 PySocks==1.7.1
+pyTelegramBotAPI==4.4.0
 python-apt==2.2.1+parrot1
 python-dateutil==2.8.1
 python-debian==0.1.39

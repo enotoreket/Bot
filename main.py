@@ -9,12 +9,13 @@ token = "5130966692:AAFwk1ePFc1ua3MnOx80EE3MrhZ_xR6EUyM"
 bot = telebot.TeleBot(token)
 
 keyboard = types.ReplyKeyboardMarkup()
-keyboard.row("!расписание сегодня", '!расписание завтра')
+keyboard.row("!Расписание сегодня", '!Расписание завтра')
 keyboard.add("/time", "/help", '/url', "/time", '/me')
+keyboard.add("!Расписание больше")
 keyboard2 = types.ReplyKeyboardMarkup()
-keyboard2.row("!расписание пн",'!расписание вт', "!расписание ср")
-keyboard2.add( '!расписание чт', "!расписание пт", '!расписание сб')
-keyboard2.add('!расписание на неделю')
+keyboard2.row("!Расписание пн",'!Расписание вт', "!Расписание ср")
+keyboard2.add( '!Расписание чт', "!Расписание пт", '!Расписание сб')
+keyboard2.add('!Расписание на неделю')
 
 
 
