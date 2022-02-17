@@ -253,12 +253,12 @@ def opene(dayw, ids, ls):
                             cell = cell.replace('Иностранный язык', 'Ин яз', 1)
                             prepod = sheet.cell(row=t, column=prepodcol).value
                         if prepod != None:
-                            o = f' &#12831{2 + c % 2}; [{c}.] ({timer}) ({prepod}) ({prakt}) {cell}'
+                            o = f'[{c}.] ({timer}) ({prepod}) ({prakt}) {cell}'
                         else:
-                            o = f' &#12831{2 + c % 2}; [{c}.] ({timer}) ({prakt}) {cell}'
+                            o = f'[{c}.] ({timer}) ({prakt}) {cell}'
 
                     else:
-                        o = f' &#12831{2 + c % 2}; [{c}.] ({timer}) Пары нет {random.choice(otvet)}'
+                        o = f'[{c}.] ({timer}) Пары нет {random.choice(otvet)}'
                     g = g + '\n' + o + '\n'
                     if urls != None:
                         g += f'{urls}\n'
