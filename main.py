@@ -10,7 +10,7 @@ bot = telebot.TeleBot(token)
 
 keyboard = types.ReplyKeyboardMarkup()
 keyboard.row("!Расписание сегодня", '!Расписание завтра')
-keyboard.add("/time", "/help", '/url', "/time", '/me')
+keyboard.add("/time", "/help", '/url', '/me')
 keyboard.add("!Расписание больше")
 keyboard2 = types.ReplyKeyboardMarkup()
 keyboard2.row("!Расписание пн",'!Расписание вт', "!Расписание ср")
@@ -102,9 +102,42 @@ def answer(message):
         opene(date(100), ids, 'chat')
 
     elif msg.find('gym') != -1:
-        send(ids, 'GYM!', 'chat')
+        for x in range(3):
+            send(ids, 'GYM!', 'chat')
     elif msg == "бот":
         send(ids, 'Бот в здании <3\nС любовью кривой кодер Артём из Gym', 'chat')
+    elif msg.find('gym?') != -1:
+        send(ids,'GYM-это империя')
+    elif (msg.find("мать") != -1) or (msg.find("мам") != -1):
+        send(ids, "Про маму лишнее было")
+    elif msg.find("ректор") != -1:
+        send(ids, "слава МТУСИ")
+    elif msg.find("дот") != -1:
+        send(ids, "Бай май шеги ба ))")
+    elif msg.find("спат") != -1:
+        send(ids, "Спи спокойно сталкер")
+    elif msg.find("жиза") != -1:
+        send(ids, "Одобряю")
+    elif msg.find("бин2105") != -1:
+        send(ids, "Первый в мире полис GYM")
+    elif msg.find("лес") != -1:
+        send(ids, "Прекрати фармить лес, животное")
+    elif msg.find("люблино") != -1:
+        send(ids, "Метро люблино-работаем")
+    elif msg == "!расписание вс":
+        send(ids, "Какое расписание додик ты шо конч иди спатьки ")
+    elif msg.find("жаль") != -1:
+        send(ids, "Жаль, не взял с собой рундук, хехех, сундук для рун - РУНДУК")
+    elif (msg == 'ты') or (msg.find(" ты ") != -1):
+        send(ids, "Ты играешь по 20 мм в день. Зачем ? Обьяснишь мне ?")
+    elif msg.find("интересно") != -1:
+        send(ids, "Что тебе интересно а ?")
+
+    elif msg.find("марг") != -1:
+        send(ids,
+                'Маргарита проявила невероятную поддержку и лояльность она вознаграждается почётным титулом подруга GYM')
+    elif (msg.find("кат") != -1) or (msg.find("мельник") != -1):
+        send(ids, 'Мельникова проявила невероятную тупость и идиотизм она позор БИН2104')
 
 
 ##ОТКРЫТИЕ ФАЙЛА
