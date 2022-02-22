@@ -19,6 +19,17 @@ keyboard2.row("!Расписание пн",'!Расписание вт', "!Ра�
 keyboard2.add('!Расписание чт', "!Расписание пт", '!Расписание сб')
 keyboard2.add('!Расписание на неделю')
 
+urllocal1=''
+
+def weather1(message):
+    if message.text.lower()=='на день':
+        bot.send_message(message.chat.id, 'Погоду в каком городе вы хотите узнать')
+        bot.register_next_step_handler(message, weather)
+    elif message.text.lower()=='на неделю':
+        bot.send_message(message.chat.id, 'Погоду в каком городе вы хотите узнать')
+        bot.register_next_step_handler(message,weather2)
+    else:
+        send(message.chat.id,'Выбора нет ключ поверни и повтори с предоставленными вариантами')
 def plagiat(message):
     try:
         msg = Translator().translate(message.text,dest='ru').text
@@ -37,6 +48,33 @@ def weather(message):
         send(message.chat.id,weat)
     except BaseException:
         send(message.chat.id,'К сожалению не удаётся найти погоду по вашему городу возможно вы его выдумали , но в любом случае сообщите об ошибке @enotoreket он обязательно всё проверит')
+
+def weather2(message):
+    try:
+        city=Translator().translate(message.text,dest='en').text
+        appid='bbc65b998ba57073bdb3373908fc2df4'
+        res = requests.get("http://api.openweathermap.org/data/2.5/forecast",params={'q': city, 'units': 'metric', 'lang': 'ru', 'APPID': appid})
+        data = res.json()
+        for i in data.get('list'):
+            weat=f'{i.get("dt_txt")}\nВ городе: {message.text}.\nПогодные условия: {i.get("weather")[0].get("description")}.\nТемпература: {i.get("main").get("temp")}.\nМинимальная температура: {i.get("main").get("temp_min")}.\nМаксимальная температура: {i.get("main").get("temp_max")}.\n'
+            if i.get('dt_txt').find('12:00:00')!=-1:
+                send(message.chat.id,weat)
+    except BaseException as e:
+        print(e)
+        send(message.chat.id,'К сожалению не удаётся найти погоду по вашему городу возможно вы его выдумали , но в любом случае сообщите об ошибке @enotoreket он обязательно всё проверит')
+def reg(message):
+    bot.send_message(message.chat.id, 'Введите номер группы')
+    global urllocal1
+    urllocal1=message.text
+    bot.register_next_step_handler(message, reg1)
+
+def reg1(message):
+    reg2(message.chat.id,message.text)
+
+def reg2(ids,group):
+    global urllocal1
+    url=" "+urllocal1
+    registr(ids,url,group)
 def translate(message):
     if message.text.lower().find('ru')!=-1:
         bot.register_next_step_handler(message, translateru)
@@ -49,8 +87,8 @@ def translate(message):
 def translateeng(message):
     msg=Translator().translate(message.text,dest='en').text
     send(message.chat.id, msg)
-def translateru(message):
 
+def translateru(message):
     msg=Translator().translate(message.text,dest='ru').text
     send(message.chat.id, msg)
 
@@ -61,9 +99,17 @@ def start(message):
     bot.send_message(message.chat.id, 'Привет! Хочешь узнать Расписание?', reply_markup=keyboard)
 
 @bot.message_handler(commands=['погода'])
-def weathermain(message):
-    bot.send_message(message.chat.id, 'Погоду в каком городе вы хотите узнать')
-    bot.register_next_step_handler(message,weather)
+def pogoda(message):
+    keyboard3= types.ReplyKeyboardMarkup()
+    keyboard3.row("на неделю", 'на день')
+    bot.send_message(message.chat.id, 'На сколько дней?', reply_markup=keyboard3)
+    bot.register_next_step_handler(message, weather1)
+
+
+@bot.message_handler(commands=['reg'])
+def registration(message):
+    bot.send_message(message.chat.id, 'Введите ссылку на ваше рассписание')
+    bot.register_next_step_handler(message,reg)
 
 @bot.message_handler(commands=['антиплагиат'])
 def antiplagiat(message):
@@ -205,7 +251,7 @@ def geturl(url):
     r= open('mtuci.html', 'r')
     urlend = ''
     count=0
-    while urlend.lower().find(url) == -1:
+    while urlend.lower().find(url.lower()) == -1:
         count+=1
         urlend = r.readline()
         if count>=2158:
