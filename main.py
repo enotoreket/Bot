@@ -5,25 +5,78 @@ import random,requests,datetime,sys,os,openpyxl
 from openpyxl import load_workbook
 from random import randint
 from requests import request
+from googletrans import Translator
+
 token = "5130966692:AAFwk1ePFc1ua3MnOx80EE3MrhZ_xR6EUyM"
 bot = telebot.TeleBot(token)
 
 keyboard = types.ReplyKeyboardMarkup()
 keyboard.row("!Расписание сегодня", '!Расписание завтра')
-keyboard.add("/time", "/help", '/url', '/me')
+keyboard.add("/антиплагиат", "/translate","/погода")
 keyboard.add("!Расписание больше")
 keyboard2 = types.ReplyKeyboardMarkup()
 keyboard2.row("!Расписание пн",'!Расписание вт', "!Расписание ср")
-keyboard2.add( '!Расписание чт', "!Расписание пт", '!Расписание сб')
+keyboard2.add('!Расписание чт', "!Расписание пт", '!Расписание сб')
 keyboard2.add('!Расписание на неделю')
 
+def plagiat(message):
+    try:
+        msg = Translator().translate(message.text,dest='ru').text
+        msg = Translator().translate(msg, dest='fi').text
+        msg = Translator().translate(msg,dest='ru').text
+        send(message.chat.id,msg)
+    except BaseException:
+        send(message.chat.id, 'Работает только с русским языком')
+def weather(message):
+    try:
+        city=Translator().translate(message.text,dest='en').text
+        appid='bbc65b998ba57073bdb3373908fc2df4'
+        res = requests.get("http://api.openweathermap.org/data/2.5/weather",params={'q': city, 'units': 'metric', 'lang': 'ru', 'APPID': appid})
+        data = res.json()
+        weat=f'В городе: {message.text}.\nПогодные условия: {data.get("weather")[0].get("description")}.\nТемпература: {data.get("main").get("temp")}.\nМинимальная температура: {data.get("main").get("temp_min")}.\nМаксимальная температура: {data.get("main").get("temp_max")}.\n'
+        send(message.chat.id,weat)
+    except BaseException:
+        send(message.chat.id,'К сожалению не удаётся найти погоду по вашему городу возможно вы его выдумали , но в любом случае сообщите об ошибке @enotoreket он обязательно всё проверит')
+def translate(message):
+    if message.text.lower().find('ru')!=-1:
+        bot.register_next_step_handler(message, translateru)
+        send(message.chat.id, 'Напишите ваше предложение')
+    elif message.text.lower().find('eng')!=-1:
+        send(message.chat.id, 'Напишите ваше предложение')
+        bot.register_next_step_handler(message, translateeng)
+    else:
+        send(message.chat.id, 'Бот не переводит ни на какие языки кроме русского и английского')
+def translateeng(message):
+    msg=Translator().translate(message.text,dest='en').text
+    send(message.chat.id, msg)
+def translateru(message):
 
+    msg=Translator().translate(message.text,dest='ru').text
+    send(message.chat.id, msg)
 
 @bot.message_handler(commands=['start'])
 def start(message):
     keyboard = types.ReplyKeyboardMarkup()
     keyboard.row("/time", "/help", '/url', "/time", '/me', "!расписание сегодня",'!расписание завтра',"!расписание пн",'!расписание вт',"!расписание ср",'!расписание чт',"!расписание пт",'!расписание сб',)
     bot.send_message(message.chat.id, 'Привет! Хочешь узнать Расписание?', reply_markup=keyboard)
+
+@bot.message_handler(commands=['погода'])
+def weathermain(message):
+    bot.send_message(message.chat.id, 'Погоду в каком городе вы хотите узнать')
+    bot.register_next_step_handler(message,weather)
+
+@bot.message_handler(commands=['антиплагиат'])
+def antiplagiat(message):
+    bot.send_message(message.chat.id, 'Введите ваш текст')
+    bot.register_next_step_handler(message,plagiat)
+
+
+@bot.message_handler(commands=['translate'])
+def translatemain(message):
+    keyboard3= types.ReplyKeyboardMarkup()
+    keyboard3.row("ru", 'eng')
+    bot.send_message(message.chat.id, 'На какой язык переводить ?', reply_markup=keyboard3)
+    bot.register_next_step_handler(message,translate)
 
 @bot.message_handler(commands=['time'])
 def time(message):
