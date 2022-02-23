@@ -200,7 +200,7 @@ def answer(message):
     elif msg.find("расписание завтра") != -1:
         opene(date(100), ids, 'chat')
 
-    elif msg.find('gym') != -1:
+    elif msg=='gym':
         for x in range(3):
             send(ids, 'GYM!', 'chat')
     elif msg == "бот":
