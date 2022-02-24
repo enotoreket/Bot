@@ -20,16 +20,6 @@ keyboard2.add('!Расписание чт', "!Расписание пт", '!Ра
 keyboard2.add('!Расписание на неделю')
 
 urllocal1=''
-
-def weather1(message):
-    if message.text.lower()=='на день':
-        bot.send_message(message.chat.id, 'Погоду в каком городе вы хотите узнать')
-        bot.register_next_step_handler(message, weather)
-    elif message.text.lower()=='на неделю':
-        bot.send_message(message.chat.id, 'Погоду в каком городе вы хотите узнать')
-        bot.register_next_step_handler(message,weather2)
-    else:
-        send(message.chat.id,'Выбора нет ключ поверни и повтори с предоставленными вариантами')
 def plagiat(message):
     try:
         msg = Translator().translate(message.text,dest='ru').text
@@ -38,15 +28,30 @@ def plagiat(message):
         send(message.chat.id,msg)
     except BaseException:
         send(message.chat.id, 'Работает только с русским языком')
+def weather1(message):
+    if message.text.lower()=='на сегодня':
+        bot.send_message(message.chat.id, 'Погоду в каком городе вы хотите узнать')
+        bot.register_next_step_handler(message, weather)
+    elif message.text.lower()=='на неделю':
+        bot.send_message(message.chat.id, 'Погоду в каком городе вы хотите узнать')
+        bot.register_next_step_handler(message,weather2)
+    elif message.text.lower()=='на завтра':
+        bot.send_message(message.chat.id, 'Погоду в каком городе вы хотите узнать')
+        bot.register_next_step_handler(message,weather3)
+    else:
+        send(message.chat.id,'Выбора нет ключ поверни и повтори с предоставленными вариантами')
 def weather(message):
     try:
         city=Translator().translate(message.text,dest='en').text
         appid='bbc65b998ba57073bdb3373908fc2df4'
         res = requests.get("http://api.openweathermap.org/data/2.5/weather",params={'q': city, 'units': 'metric', 'lang': 'ru', 'APPID': appid})
         data = res.json()
-        weat=f'В городе: {message.text}.\nПогодные условия: {data.get("weather")[0].get("description")}.\nТемпература: {data.get("main").get("temp")}.\nМинимальная температура: {data.get("main").get("temp_min")}.\nМаксимальная температура: {data.get("main").get("temp_max")}.\n'
+        rofl=''
+        if data.get("visibility") >900 :
+            rofl='\nВы успеете разледеть снаряд летящий в вашу сторону.'
+        weat=f'В городе: {message.text}.\nПогодные условия: {data.get("weather")[0].get("description")}.\nТемпература: {data.get("main").get("temp")}° \nОщущается как: {data.get("main").get("feels_like")}°.\nМинимальная температура: {data.get("main").get("temp_min")}°.\nМаксимальная температура: {data.get("main").get("temp_max")}°.\nТекущая видимость: {data.get("visibility")} метров.{rofl}\n Текущая скорость ветра: {data.get("wind").get("speed")} метров в секунду.\n'
         send(message.chat.id,weat)
-    except BaseException:
+    except BaseException as e:
         send(message.chat.id,'К сожалению не удаётся найти погоду по вашему городу возможно вы его выдумали , но в любом случае сообщите об ошибке @enotoreket он обязательно всё проверит')
 
 def weather2(message):
@@ -55,10 +60,42 @@ def weather2(message):
         appid='bbc65b998ba57073bdb3373908fc2df4'
         res = requests.get("http://api.openweathermap.org/data/2.5/forecast",params={'q': city, 'units': 'metric', 'lang': 'ru', 'APPID': appid})
         data = res.json()
+        print(data)
         for i in data.get('list'):
-            weat=f'{i.get("dt_txt")}\nВ городе: {message.text}.\nПогодные условия: {i.get("weather")[0].get("description")}.\nТемпература: {i.get("main").get("temp")}.\nМинимальная температура: {i.get("main").get("temp_min")}.\nМаксимальная температура: {i.get("main").get("temp_max")}.\n'
-            if i.get('dt_txt').find('12:00:00')!=-1:
-                send(message.chat.id,weat)
+            rofl = ''
+            if i.get("visibility") > 900:
+                rofl = 'Вы успеете разледеть снаряд летящий в вашу сторону'
+            weat = f'{i.get("dt_txt")}\nВ городе: {message.text}.\nПогодные условия: {i.get("weather")[0].get("description")}.\nТемпература: {i.get("main").get("temp")}° ощущается как: {i.get("main").get("feels_like")}°.\nМинимальная температура: {i.get("main").get("temp_min")}°.\nМаксимальная температура: {i.get("main").get("temp_max")}°.\nТекущая видимость: {i.get("visibility")} метров {rofl}.\n Текущая скорость ветра: {i.get("wind").get("speed")} метров в секунду.\n'
+
+            if datetime.datetime.now().timetuple().tm_hour<12:
+                if i.get('dt_txt').find('12:00:00') != -1:
+                    send(message.chat.id,weat)
+            else:
+                if i.get('dt_txt').find('00:00:00') != -1:
+                    send(message.chat.id, weat)
+    except BaseException as e:
+        send(message.chat.id,'К сожалению не удаётся найти погоду по вашему городу возможно вы его выдумали , но в любом случае сообщите об ошибке @enotoreket он обязательно всё проверит')
+def weather3(message):
+    try:
+        city=Translator().translate(message.text,dest='en').text
+        appid='bbc65b998ba57073bdb3373908fc2df4'
+        res = requests.get("http://api.openweathermap.org/data/2.5/forecast",params={'q': city, 'units': 'metric', 'lang': 'ru', 'APPID': appid})
+        data = res.json()
+        c=0
+        for i in data.get('list'):
+            c+=1
+            rofl = ''
+            if i.get("visibility") > 900:
+                rofl = 'Вы успеете разледеть снаряд летящий в вашу сторону'
+            weat = f'{i.get("dt_txt")}\nВ городе: {message.text}.\nПогодные условия: {i.get("weather")[0].get("description")}.\nТемпература: {i.get("main").get("temp")}° ощущается как: {i.get("main").get("feels_like")}°.\nМинимальная температура: {i.get("main").get("temp_min")}°.\nМаксимальная температура: {i.get("main").get("temp_max")}°.\nТекущая видимость: {i.get("visibility")} метров {rofl}.\n Текущая скорость ветра: {i.get("wind").get("speed")} метров в секунду.\n'
+
+
+            if datetime.datetime.now().timetuple().tm_hour < 12:
+                if i.get('dt_txt').find('12:00:00')!=-1 and c==1:
+                    send(message.chat.id,weat)
+            else:
+                if i.get('dt_txt').find('00:00:00') != -1 and c==2:
+                    send(message.chat.id, weat)
     except BaseException as e:
         print(e)
         send(message.chat.id,'К сожалению не удаётся найти погоду по вашему городу возможно вы его выдумали , но в любом случае сообщите об ошибке @enotoreket он обязательно всё проверит')
@@ -101,7 +138,7 @@ def start(message):
 @bot.message_handler(commands=['погода'])
 def pogoda(message):
     keyboard3= types.ReplyKeyboardMarkup()
-    keyboard3.row("на неделю", 'на день')
+    keyboard3.row("на неделю", 'на завтра','на сегодня')
     bot.send_message(message.chat.id, 'На сколько дней?', reply_markup=keyboard3)
     bot.register_next_step_handler(message, weather1)
 
@@ -163,42 +200,90 @@ def answer(message):
         registr(ids, x[0], x[1])
 
     elif msg.find("!понедельник") != -1:
-        opene(date(1), ids, 'chat')
+        try:
+            opene(date(1), ids, 'chat')
+        except BaseException:
+            send(ids,'Возможно вы не зарегистрировались в боте напишите /reg')
     elif msg.find("!вторник") != -1:
-        opene(date(2), ids, 'chat')
+        try:
+            opene(date(2), ids, 'chat')
+        except BaseException:
+            send(ids,'Возможно вы не зарегистрировались в боте напишите /reg')
     elif msg.find("!среда") != -1:
-        opene(date(3), ids, 'chat')
+        try:
+            opene(date(3), ids, 'chat')
+        except BaseException:
+            send(ids,'Возможно вы не зарегистрировались в боте напишите /reg')
     elif msg.find("!четверг") != -1:
-        opene(date(4), ids, 'chat')
+        try:
+            opene(date(4), ids, 'chat')
+        except BaseException:
+            send(ids,'Возможно вы не зарегистрировались в боте напишите /reg')
     elif msg.find("!пятница") != -1:
-        opene(date(5), ids, 'chat')
+        try:
+            opene(date(5), ids, 'chat')
+        except BaseException:
+            send(ids,'Возможно вы не зарегистрировались в боте напишите /reg')
     elif msg.find("!суббота") != -1:
-        opene(date(6), ids, 'chat')
+        try:
+            opene(date(6), ids, 'chat')
+        except BaseException:
+            send(ids,'Возможно вы не зарегистрировались в боте напишите /reg')
     elif msg.find("!расписание на неделю") != -1:
-        opene(date(0), ids, 'chat_all')
+        try:
+            opene(date(0), ids, 'chat_all')
+        except BaseException:
+            send(ids,'Возможно вы не зарегистрировались в боте напишите /reg')
     elif msg.find('!расписание больше')!=-1:
         send(ids,"Какой день вас интересует",'chat',keyboard2)
 
     elif msg == "!расписание пн":
-        opene(date(1), ids, 'chat')
+        try:
+            opene(date(1), ids, 'chat')
+        except BaseException:
+            send(ids,'Возможно вы не зарегистрировались в боте напишите /reg')
     elif msg == "!расписание вт":
-        opene(date(2), ids, 'chat')
+        try:
+            opene(date(2), ids, 'chat')
+        except BaseException:
+            send(ids,'Возможно вы не зарегистрировались в боте напишите /reg')
     elif msg == "!расписание ср":
-        opene(date(3), ids, 'chat')
+        try:
+            opene(date(3), ids, 'chat')
+        except BaseException:
+            send(ids,'Возможно вы не зарегистрировались в боте напишите /reg')
     elif msg == "!расписание чт":
-        opene(date(4), ids, 'chat')
+        try:
+            opene(date(4), ids, 'chat')
+        except BaseException:
+            send(ids,'Возможно вы не зарегистрировались в боте напишите /reg')
     elif msg == "!расписание пт":
-        opene(date(5), ids, 'chat')
+        try:
+            opene(date(5), ids, 'chat')
+        except BaseException:
+            send(ids,'Возможно вы не зарегистрировались в боте напишите /reg')
     elif msg == "!расписание сб":
-        opene(date(6), ids, 'chat')
+        try:
+            opene(date(6), ids, 'chat')
+        except BaseException:
+            send(ids,'Возможно вы не зарегистрировались в боте напишите /reg')
     elif msg == "!расписание вс":
-        opene(date(7), ids, 'chat')
+        try:
+            opene(date(7), ids, 'chat')
+        except BaseException:
+            send(ids,'Возможно вы не зарегистрировались в боте напишите /reg')
     elif msg.find("расписание сегодня") != -1:
-        opene(date(0), ids, 'chat')
+        try:
+            opene(date(0), ids, 'chat')
+        except BaseException:
+            send(ids,'Возможно вы не зарегистрировались в боте напишите /reg')
     elif msg.find("!негр") != -1:
         send(ids, message, 'chat')
     elif msg.find("расписание завтра") != -1:
-        opene(date(100), ids, 'chat')
+        try:
+            opene(date(100), ids, 'chat')
+        except BaseException:
+            send(ids,'Возможно вы не зарегистрировались в боте напишите /reg')
 
     elif msg=='gym':
         for x in range(3):
